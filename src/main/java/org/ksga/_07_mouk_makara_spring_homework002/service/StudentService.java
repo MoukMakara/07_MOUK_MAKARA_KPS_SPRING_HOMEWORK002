@@ -22,5 +22,4 @@ public interface StudentService {
 
     // updateStudentById
     Student updateStudentById(Integer id, StudentUpdateRequest studentUpdateRequest);
-
 }

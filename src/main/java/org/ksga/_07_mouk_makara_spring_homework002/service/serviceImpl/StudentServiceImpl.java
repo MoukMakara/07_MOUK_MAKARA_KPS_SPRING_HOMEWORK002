@@ -1,5 +1,6 @@
 package org.ksga._07_mouk_makara_spring_homework002.service.serviceImpl;
 
+import org.apache.ibatis.annotations.Param;
 import org.ksga._07_mouk_makara_spring_homework002.model.Course;
 import org.ksga._07_mouk_makara_spring_homework002.model.Student;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.CourseCreateRequest;
@@ -66,6 +67,14 @@ public class StudentServiceImpl implements StudentService {
         for (Integer courseId : studentUpdateRequest.getCourses()) {
             studentRepository.updateStudentCourse(student.getStudentId(), courseId);
         }
+        // update new StudentName
+        student.setStudentName(studentUpdateRequest.getStudentName());
+        student.setEmail(studentUpdateRequest.getEmail());
+        student.setPhoneNumber(studentUpdateRequest.getPhoneNumber());
+
+        // update student
+        studentRepository.updateStudentById(student.getStudentId(), studentUpdateRequest);
+
         return studentRepository.findStudentById(student.getStudentId());
     }
 

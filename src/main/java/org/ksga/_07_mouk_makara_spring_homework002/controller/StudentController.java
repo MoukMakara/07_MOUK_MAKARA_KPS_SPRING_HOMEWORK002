@@ -4,6 +4,7 @@ import org.ksga._07_mouk_makara_spring_homework002.model.Student;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentCreateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentUpdateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.response.ApiResponse;
+import org.ksga._07_mouk_makara_spring_homework002.model.response.ErrorResponse;
 import org.ksga._07_mouk_makara_spring_homework002.service.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,16 +37,27 @@ public class StudentController {
 
     // findStudentById
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Student>> findStudentById(@PathVariable Integer id){
+    public ResponseEntity<?> findStudentById(@PathVariable Integer id){
         Student student = studentService.findStudentById(id);
 
-        ApiResponse<Student> response = ApiResponse.<Student>builder()
-                .message("Find student by id is successfully")
-                .payload(student)
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        if(student != null){
+            ApiResponse<Student> response = ApiResponse.<Student>builder()
+                    .message("Find student by id is successfully")
+                    .payload(student)
+                    .status(HttpStatus.OK)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        // custom error response
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                "about:blank",
+                "Not Found",
+                HttpStatus.NOT_FOUND.value(),
+                "Students with ID " + id + " not found.",
+                "/api/v1/students/" + id,
+                LocalDateTime.now()
+        ));
     }
     // createCourse
     @PostMapping
@@ -62,37 +74,52 @@ public class StudentController {
     }
     // deleteStudentById
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Student>> deleteStudentById(@PathVariable Integer id){
+    public ResponseEntity<?> deleteStudentById(@PathVariable Integer id){
         Student existingStudent = studentService.findStudentById(id);
 
         if(existingStudent == null){
-            return ResponseEntity.noContent().build();
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Students with ID " + id + " not found.",
+                    "/api/v1/students/" + id,
+                    LocalDateTime.now()
+            ));
         }
         studentService.deleteStudentById(id);
-        ApiResponse<Student> response = ApiResponse.<Student>builder()
+
+
+        return ResponseEntity.ok(ApiResponse.<Student>builder()
                 .message("Delete student is successfully deleted")
                 .payload(existingStudent)
                 .status(HttpStatus.NO_CONTENT)
                 .timestamp(LocalDateTime.now())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+                .build());
     }
     // updateStudentById
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Student>> updateStudentById(@PathVariable Integer id,@RequestBody StudentUpdateRequest studentUpdateRequest){
+    public ResponseEntity<?> updateStudentById(@PathVariable Integer id,@RequestBody StudentUpdateRequest studentUpdateRequest){
         Student exitingStudent = studentService.findStudentById(id);
         if (exitingStudent == null){
-            return ResponseEntity.notFound().build();
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Students with ID " + id + " not found.",
+                    "/api/v1/students/" + id,
+                    LocalDateTime.now()
+            ));
         }
         Student updatedStudent = studentService.updateStudentById(id, studentUpdateRequest);
 
-        ApiResponse<Student> response = ApiResponse.<Student>builder()
+        return ResponseEntity.ok(ApiResponse.<Student>builder()
                 .message("Update student is successfully")
                 .payload(updatedStudent)
                 .status(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+                .build());
     }
 }

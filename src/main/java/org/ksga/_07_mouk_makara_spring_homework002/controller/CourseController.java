@@ -4,6 +4,7 @@ import org.ksga._07_mouk_makara_spring_homework002.model.Course;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.CourseCreateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.CourseUpdateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.response.ApiResponse;
+import org.ksga._07_mouk_makara_spring_homework002.model.response.ErrorResponse;
 import org.ksga._07_mouk_makara_spring_homework002.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +36,27 @@ public class CourseController {
     }
     // findCourseById
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Course>> findCourseById(@PathVariable Integer id){
+    public ResponseEntity<?> findCourseById(@PathVariable Integer id){
         Course course = courseService.findCourseById(id);
 
-        ApiResponse<Course> response = ApiResponse.<Course>builder()
-                .message("Find course by id is successfully")
-                .payload(course)
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        if(course != null){
+            ApiResponse<Course> response = ApiResponse.<Course>builder()
+                    .message("Find course by id is successfully")
+                    .payload(course)
+                    .status(HttpStatus.OK)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        // custom error response
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                "about:blank",
+                "Not Found",
+                HttpStatus.NOT_FOUND.value(),
+                "Courses with ID " + id + " not found.",
+                "/api/v1/courses/" + id,
+                LocalDateTime.now()
+        ));
     }
 //    createCourse
     @PostMapping
@@ -61,28 +73,42 @@ public class CourseController {
     }
     // deleteCourseById
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Course>> deleteCourseById(@PathVariable Integer id){
+    public ResponseEntity<?> deleteCourseById(@PathVariable Integer id){
         Course deletedCourse = courseService.findCourseById(id);
         if (deletedCourse == null){
-            return ResponseEntity.notFound().build();
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Courses with ID " + id + " not found.",
+                    "/api/v1/courses/" + id,
+                    LocalDateTime.now()
+            ));
         }
         courseService.deleteCourseById(id);
 
-        ApiResponse<Course> response = ApiResponse.<Course>builder()
+        return ResponseEntity.ok(ApiResponse.<Course>builder()
                 .message("Delete course by id is successfully")
-                .payload(deletedCourse)
                 .status(HttpStatus.NO_CONTENT)
                 .timestamp(LocalDateTime.now())
-                .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+                .build());
     }
     // updateCourseById
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Course>> updateCourseById(@PathVariable Integer id, @RequestBody CourseUpdateRequest courseUpdateRequest){
+    public ResponseEntity<?> updateCourseById(@PathVariable Integer id, @RequestBody CourseUpdateRequest courseUpdateRequest){
         Course exitingCourse = courseService.findCourseById(id);
 
         if (exitingCourse == null){
-            return ResponseEntity.notFound().build();
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Courses with ID " + id + " not found.",
+                    "/api/v1/courses/" + id,
+                    LocalDateTime.now()
+            ));
         }
         Course updatedCourse = courseService.updateCourseById(id, courseUpdateRequest);
         ApiResponse<Course> response = ApiResponse.<Course>builder()

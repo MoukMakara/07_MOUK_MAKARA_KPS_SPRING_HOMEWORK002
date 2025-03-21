@@ -4,6 +4,7 @@ import org.ksga._07_mouk_makara_spring_homework002.model.Instructor;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.InstructorCreateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.InstructorUpdateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.response.ApiResponse;
+import org.ksga._07_mouk_makara_spring_homework002.model.response.ErrorResponse;
 import org.ksga._07_mouk_makara_spring_homework002.service.InstructorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,22 +49,47 @@ public class InstructorController {
     }
     // findInstructorById
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Instructor>> findInstructorById(@PathVariable Integer id){
+    public ResponseEntity<?> findInstructorById(@PathVariable Integer id) {
         Instructor instructor = instructorService.findInstructorById(id);
-        if (instructor != null){
+
+        if (instructor != null) {
             return ResponseEntity.ok(ApiResponse.<Instructor>builder()
-                           .message("Find instructor by id is successfully")
-                           .payload(instructor)
-                           .status(HttpStatus.OK)
-                           .timestamp(LocalDateTime.now())
-                           .build());
+                    .message("Find instructor by id is successful")
+                    .payload(instructor)
+                    .status(HttpStatus.OK)
+                    .timestamp(LocalDateTime.now())
+                    .build());
         }
-        return ResponseEntity.notFound().build();
+
+        // custom error response
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                "about:blank",
+                "Not Found",
+                HttpStatus.NOT_FOUND.value(),
+                "Instructor with ID " + id + " not found.",
+                "/api/v1/instructors/" + id,
+                LocalDateTime.now()
+        ));
     }
     // deleteInstructorById
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteInstructorById(@PathVariable Integer id){
+        Instructor instructor = instructorService.findInstructorById(id);
+
+        if (instructor == null){
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Instructor with ID " + id + " not found.",
+                    "/api/v1/instructors/" + id,
+                    LocalDateTime.now()
+            ));
+        }
+
         instructorService.deleteInstructorById(id);
+
         return ResponseEntity.ok(ApiResponse.builder()
                            .message("Delete instructor by id is successfully")
                            .status(HttpStatus.NO_CONTENT)
@@ -72,12 +98,20 @@ public class InstructorController {
     }
     // updateInstructorById
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Instructor>> updateInstructorById(@PathVariable Integer id, @RequestBody InstructorUpdateRequest instructorUpdateRequest) {
+    public ResponseEntity<?> updateInstructorById(@PathVariable Integer id, @RequestBody InstructorUpdateRequest instructorUpdateRequest) {
 
         Instructor existingInstructor = instructorService.findInstructorById(id);
 
         if (existingInstructor == null) {
-            return ResponseEntity.notFound().build();
+            // custom error response
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                    "about:blank",
+                    "Not Found",
+                    HttpStatus.NOT_FOUND.value(),
+                    "Instructor with ID " + id + " not found.",
+                    "/api/v1/instructors/" + id,
+                    LocalDateTime.now()
+            ));
         }
 
         Instructor updatedInstructor = instructorService.updateInstructorById(id, instructorUpdateRequest);

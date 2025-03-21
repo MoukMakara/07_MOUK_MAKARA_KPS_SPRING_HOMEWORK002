@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.ksga._07_mouk_makara_spring_homework002.model.Course;
 import org.ksga._07_mouk_makara_spring_homework002.model.Student;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentCreateRequest;
+import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentUpdateRequest;
 
 import java.util.List;
 
@@ -60,10 +61,31 @@ public interface StudentRepository {
     @Insert("""
     INSERT INTO student_course(student_id, course_id)
     VALUES (#{studentId}, #{courseId})
-""")
+    """)
     void createStudentCourse(Integer studentId, Integer courseId);
 
     // delete student
     @Delete("DELETE FROM students WHERE student_id = #{studentId}")
     void deleteStudentById(Integer studentId);
+
+    // update student by id
+    @Update("""
+    UPDATE students
+    SET student_name = #{student.studentName}, email = #{student.email}, phone_number = #{student.phoneNumber}
+    WHERE student_id = #{studentId} RETURNING student_id
+    """)
+    Integer updateStudentById(@Param("studentId") Integer id, @Param("student") StudentUpdateRequest studentUpdateRequest);
+
+    // update student_course
+    @Insert("""
+    insert into student_course(student_id, course_id)
+    VALUES (#{studentId}, #{courseId})
+""")
+    void updateStudentCourse(Integer studentId, Integer courseId);
+
+    // delete student_course
+    @Select("""
+    DELETE FROM student_course WHERE student_id = #{studentId}
+""")
+    void deleteStudentCourse(Integer studentId);
 }

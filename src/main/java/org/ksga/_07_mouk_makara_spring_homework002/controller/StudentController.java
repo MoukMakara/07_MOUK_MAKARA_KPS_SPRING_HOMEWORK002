@@ -2,6 +2,7 @@ package org.ksga._07_mouk_makara_spring_homework002.controller;
 
 import org.ksga._07_mouk_makara_spring_homework002.model.Student;
 import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentCreateRequest;
+import org.ksga._07_mouk_makara_spring_homework002.model.request.StudentUpdateRequest;
 import org.ksga._07_mouk_makara_spring_homework002.model.response.ApiResponse;
 import org.ksga._07_mouk_makara_spring_homework002.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -76,5 +77,22 @@ public class StudentController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+    // updateStudentById
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Student>> updateStudentById(@PathVariable Integer id,@RequestBody StudentUpdateRequest studentUpdateRequest){
+        Student exitingStudent = studentService.findStudentById(id);
+        if (exitingStudent == null){
+            return ResponseEntity.notFound().build();
+        }
+        Student updatedStudent = studentService.updateStudentById(id, studentUpdateRequest);
+
+        ApiResponse<Student> response = ApiResponse.<Student>builder()
+                .message("Update student is successfully")
+                .payload(updatedStudent)
+                .status(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

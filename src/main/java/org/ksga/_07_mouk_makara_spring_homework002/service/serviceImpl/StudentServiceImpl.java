@@ -37,7 +37,7 @@ public class StudentServiceImpl implements StudentService {
     public Student createStudent(StudentCreateRequest studentCreateRequest) {
         Integer studentId = studentRepository.createStudent(studentCreateRequest);
 
-        for (Integer courseId : studentCreateRequest.getCourses()) {
+        for (Integer courseId : studentCreateRequest.getCourses()) {  // 1 ,2 ,3
             studentRepository.createStudentCourse(studentId, courseId);
         }
         return studentRepository.findStudentById(studentId);

@@ -63,6 +63,9 @@ public class CourseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Course>> deleteCourseById(@PathVariable Integer id){
         Course deletedCourse = courseService.findCourseById(id);
+        if (deletedCourse == null){
+            return ResponseEntity.notFound().build();
+        }
         courseService.deleteCourseById(id);
 
         ApiResponse<Course> response = ApiResponse.<Course>builder()

@@ -1,4 +1,4 @@
-package org.ksga._07_mouk_makara_spring_homework002.model;
+package org.ksga._07_mouk_makara_spring_homework002.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
-    private Integer studentId;
+public class StudentCreateRequest {
     private String studentName;
     private String email;
     private String phoneNumber;
-    private List<String> courses;
+    private List<Integer> courses;
 }

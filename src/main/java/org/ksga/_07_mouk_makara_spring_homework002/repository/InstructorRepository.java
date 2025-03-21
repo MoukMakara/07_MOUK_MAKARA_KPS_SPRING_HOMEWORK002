@@ -41,9 +41,9 @@ public interface InstructorRepository {
     void deleteInstructorById(Integer id);
 
     // update instructor by id
-    @Select("UPDATE instructors SET instructor_name = #{instructorName}, email = #{email} WHERE instructor_id = #{id} RETURNING *")
+    @Select("UPDATE instructors SET instructor_name = #{instructor.instructorName}, email = #{instructor.email} WHERE instructor_id = #{id} RETURNING *")
     @ResultMap("instructorMapper")
-    Instructor updateInstructorById(@Param("id") Integer id, String instructorName, String email);
+    Instructor updateInstructorById(@Param("id") Integer id,@Param("instructor") InstructorUpdateRequest instructorUpdateRequest);
 
 
 }

@@ -42,7 +42,7 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public Instructor updateInstructorById(Integer id, InstructorUpdateRequest instructorUpdateRequest) {
-        return instructorRepository.updateInstructorById(id, instructorUpdateRequest.getInstructorName(), instructorUpdateRequest.getEmail());
+        return instructorRepository.updateInstructorById(id, instructorUpdateRequest);
     }
 
 }

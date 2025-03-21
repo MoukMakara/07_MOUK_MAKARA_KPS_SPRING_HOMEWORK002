@@ -30,7 +30,13 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student createStudent(StudentCreateRequest studentCreateRequest) {
-        return studentRepository.createStudent(studentCreateRequest);
+        Integer studentId = studentRepository.createStudent(studentCreateRequest);
+
+        for (Integer courseId : studentCreateRequest.getCourses()){
+            studentRepository.createStudentCourse(studentId, courseId);
+        }
+        return studentRepository.findStudentById(studentId);
+
     }
 
     @Override

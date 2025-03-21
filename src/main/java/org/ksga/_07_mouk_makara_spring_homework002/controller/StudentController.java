@@ -50,7 +50,7 @@ public class StudentController {
     @PostMapping
     public ResponseEntity<ApiResponse<Student>> createStudent(@RequestBody StudentCreateRequest studentCreateRequest){
         Student newStudent = studentService.createStudent(studentCreateRequest);
-
+        System.out.println(newStudent);
         ApiResponse<Student> response = ApiResponse.<Student>builder()
                 .message("Student is successfully created")
                 .payload(newStudent)

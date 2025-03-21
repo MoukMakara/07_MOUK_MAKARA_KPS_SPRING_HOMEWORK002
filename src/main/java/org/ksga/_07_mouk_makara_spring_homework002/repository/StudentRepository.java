@@ -19,9 +19,9 @@ public interface StudentRepository {
             @Result(property = "studentName", column = "student_name"),
             @Result(property = "email", column = "email"),
             @Result(property = "phoneNumber", column = "phone_number"),
-//            @Result(property = "courses", column = "student_id",
-//                    many = @Many(select = "org.ksga._07_mouk_makara_spring_homework002.repository.StudentRepository.findCoursesByStudentId")
-//            )
+            @Result(property = "courses", column = "student_id",
+                    many = @Many(select = "org.ksga._07_mouk_makara_spring_homework002.repository.StudentRepository.findCoursesByStudentId")
+            )
     })
     List<Student> findAllStudents(@Param("page") Integer page, @Param("size") Integer size);
 
@@ -31,24 +31,37 @@ public interface StudentRepository {
         INNER JOIN student_course sc ON c.course_id = sc.course_id
         WHERE sc.student_id = #{studentId}
     """)
+    @Results(id = "courseMapper", value = {
+            @Result(property = "courseId", column = "course_id"),
+            @Result(property = "courseName", column = "course_name"),
+            @Result(property = "instructor", column = "instructor_id",
+                one = @One(select = "org.ksga._07_mouk_makara_spring_homework002.repository.InstructorRepository.findInstructorById")
+            )
+    })
     List<Course> findCoursesByStudentId(@Param("studentId") Integer studentId);
 
     // find student by id
     @Select("""
-        SELECT * FROM students 
+        SELECT * FROM students
         WHERE student_id = #{studentId}
     """)
     @ResultMap("studentMapper")
     Student findStudentById(Integer studentId);
 
-    // Create student and return the newly inserted student
+    // Create student
     @Select("""
-        INSERT INTO students (student_name, email, phone_number, course_id) 
-        VALUES (#{student.studentName}, #{student.email}, #{student.phoneNumber}, #{student.courses})
-        RETURNING *
+        INSERT INTO students (student_name, email, phone_number)
+        VALUES (#{student.studentName}, #{student.email}, #{student.phoneNumber})
+        RETURNING student_id
     """)
-    @ResultMap("studentMapper")
-    Student createStudent(@Param("student") StudentCreateRequest studentCreateRequest);
+    Integer createStudent(@Param("student") StudentCreateRequest studentCreateRequest);
+
+    // create student in table student_course
+    @Insert("""
+    INSERT INTO student_course(student_id, course_id)
+    VALUES (#{studentId}, #{courseId})
+""")
+    void createStudentCourse(Integer studentId, Integer courseId);
 
     // delete student
     @Delete("DELETE FROM students WHERE student_id = #{studentId}")

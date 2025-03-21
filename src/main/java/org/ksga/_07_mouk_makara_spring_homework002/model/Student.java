@@ -14,5 +14,5 @@ public class Student {
     private String studentName;
     private String email;
     private String phoneNumber;
-    private List<String> courses;
+    private List<Course> courses;
 }
